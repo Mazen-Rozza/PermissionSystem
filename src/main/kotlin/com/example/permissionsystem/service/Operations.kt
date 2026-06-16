@@ -10,9 +10,14 @@ class Operations {
 
     val users = mutableMapOf<Int, User>()
 
-    fun addRole(userId : Int, roleName : String) : RoleOperationResult {
+    fun addRole(userId: Int, roleName: String): RoleOperationResult {
+
+        val matchedUser = users[userId] ?: throw IllegalArgumentException("User with id $userId not found")
 
         val matchedRole = UserRole.entries.find { it.name == roleName.uppercase() }
         matchedRole ?: throw IllegalArgumentException("Role $roleName not found")
+
+        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
+
     }
 }
