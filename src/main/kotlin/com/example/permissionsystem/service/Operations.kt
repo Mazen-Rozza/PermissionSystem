@@ -8,7 +8,13 @@ import org.springframework.stereotype.Service
 @Service
 class Operations {
 
-    val users = mutableMapOf<Int, User>()
+    val users = mutableMapOf(
+    1 to User(1, 0L),
+    2 to User(2, UserRole.ADMIN.rolesMask),
+    3 to User(3, UserRole.ADMIN.rolesMask or UserRole.MODERATOR.rolesMask),
+    4 to User(4, UserRole.GUEST.rolesMask or UserRole.SUPPORT.rolesMask or UserRole.MANAGER.rolesMask),
+    5 to User(5, UserRole.SUPER_ADMIN.rolesMask)
+    )
 
     fun addRole(userId: Int, roleName: String): RoleOperationResult {
 
