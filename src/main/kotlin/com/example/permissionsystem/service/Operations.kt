@@ -58,6 +58,12 @@ class Operations {
         }
     }
 
+    fun checkUserRoles(userId: Int): List<String> {
+        validateUserExists(userId)
+
+
+    }
+
     fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
         val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
         val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
