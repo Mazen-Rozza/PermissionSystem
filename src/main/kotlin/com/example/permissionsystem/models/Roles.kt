@@ -1,6 +1,6 @@
 package com.example.permissionsystem.models
 
-enum class UserRole(val rolesMask : Long) {
+enum class UserRole(val rolesMask: Long) {
     USER(1L),
     ADMIN(1L shl 1),
     GUEST(1L shl 2),

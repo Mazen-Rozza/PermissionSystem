@@ -26,14 +26,11 @@ class Operations {
             return RoleOperationResult("User with id $userId already has the role ${matchedRole.name}", stringRolesList)
         } else {
             val newMask = matchedUser.assignedRole or matchedRole.rolesMask
-            val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
-            val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
-            val newUserRoles = matchedUser.copy(assignedRole = newMask)
+            val roleUpdate = updateUserRole(matchedUser, newMask)
 
-            users[userId] = newUserRoles
             return RoleOperationResult(
                 "Role $matchedRole was added to the user with id $userId successfully",
-                stringFinalRolesList
+                roleUpdate
             )
         }
     }
@@ -46,14 +43,11 @@ class Operations {
         if (matchedRole in rolesList) {
             val deleteMask = matchedRole.rolesMask.inv()
             val newMask = deleteMask and matchedUser.assignedRole
-            val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
-            val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
-            val newUserRoles = matchedUser.copy(assignedRole = newMask)
+            val roleUpdate = updateUserRole(matchedUser, newMask)
 
-            users[userId] = newUserRoles
             return RoleOperationResult(
                 "Role $matchedRole was deleted successfully from the user with id $userId",
-                stringFinalRolesList
+                roleUpdate
             )
         } else {
             val stringRolesList: List<String> = rolesList.map { it.name }
@@ -62,6 +56,15 @@ class Operations {
                 stringRolesList
             )
         }
+    }
+
+    fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
+        val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
+        val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
+        val newUserRoles = matchedUser.copy(assignedRole = newMask)
+
+        users[matchedUser.useId] = newUserRoles
+        return stringFinalRolesList
     }
 
     fun validateUserExists(userId: Int): User {
