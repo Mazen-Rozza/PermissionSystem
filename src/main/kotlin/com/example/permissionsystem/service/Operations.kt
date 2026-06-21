@@ -58,10 +58,24 @@ class Operations {
         }
     }
 
-    fun checkUserRoles(userId: Int): List<String> {
-        validateUserExists(userId)
+    fun getUserRoles(userId: Int): RoleOperationResult {
+        val matchedUser = validateUserExists(userId)
 
+        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
+        val stringRolesList: List<String> = rolesList.map { it.name }
 
+        return RoleOperationResult (
+            "Roles retrieved successfully for user with id $userId",
+            stringRolesList
+        )
+    }
+
+    fun checkUserRole(userId: Int, roleName: String): Boolean {
+        val matchedUser = validateUserExists(userId)
+        val matchedRole = validateRoleExists(roleName)
+
+        val hasRole = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
+        return matchedRole in hasRole
     }
 
     fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
