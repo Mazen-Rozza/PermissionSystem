@@ -11,8 +11,6 @@ fun main(args: Array<String>) {
     runApplication<PermissionSystemApplication>(*args)
 }
 
-
-
 //fun main() {
 //    val operationInstance = Operations()
 //
