@@ -17,25 +17,25 @@ class RoleController(private val operation: Operations) {
 
     @PatchMapping("/{userId}/roles/{roleName}")
     fun addRoleToUser(@PathVariable userId: Int, @PathVariable roleName: String): ResponseEntity<RoleOperationResult> {
-        val addedRole = operation.addRole(userId, roleName)
-        return ResponseEntity(addedRole, HttpStatus.OK)
+        val addRoleResult = operation.addRole(userId, roleName)
+        return ResponseEntity(addRoleResult, HttpStatus.OK)
     }
 
     @DeleteMapping("/{userId}/roles/{roleName}")
     fun removeRoleFromUser(@PathVariable userId: Int, @PathVariable roleName: String): ResponseEntity<RoleOperationResult> {
-        val removedRole = operation.deleteRole(userId, roleName)
-        return ResponseEntity(removedRole, HttpStatus.OK)
+        val deleteRoleResult = operation.deleteRole(userId, roleName)
+        return ResponseEntity(deleteRoleResult, HttpStatus.OK)
     }
 
     @GetMapping("/{userId}/roles")
     fun getRolesByUser(@PathVariable userId: Int): ResponseEntity<RoleOperationResult> {
-        val listedRoles = operation.getUserRoles(userId)
-        return ResponseEntity(listedRoles, HttpStatus.OK)
+        val getUserRolesResult = operation.getUserRoles(userId)
+        return ResponseEntity(getUserRolesResult, HttpStatus.OK)
     }
 
     @GetMapping("/{userId}/roles/{roleName}")
     fun checkRolesByUser(@PathVariable userId: Int, @PathVariable roleName: String): ResponseEntity<Boolean> {
-        val checkedRole = operation.checkUserRole(userId, roleName)
-        return ResponseEntity(checkedRole, HttpStatus.OK)
+        val checkRoleResult = operation.checkUserRole(userId, roleName)
+        return ResponseEntity(checkRoleResult, HttpStatus.OK)
     }
 }
