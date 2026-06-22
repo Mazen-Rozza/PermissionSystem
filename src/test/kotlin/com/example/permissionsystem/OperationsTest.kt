@@ -1,6 +1,7 @@
 package com.example.permissionsystem
 
 import com.example.permissionsystem.service.Operations
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
@@ -25,5 +26,16 @@ class OperationsTest {
         assertThrows<IllegalArgumentException> {
             operationsTest.validateRoleExists("Pizza")
         }
+    }
+
+    @Test
+    fun `should return RoleOperationResult with msg and correct id and role name`() {
+        val userId = 3
+        val roleName = "Admin"
+
+        val addRoleResult = operationsTest.addRole(userId, roleName)
+
+        assertEquals("3", addRoleResult.msg)
+        assertEquals("Developer", result.role)
     }
 }
