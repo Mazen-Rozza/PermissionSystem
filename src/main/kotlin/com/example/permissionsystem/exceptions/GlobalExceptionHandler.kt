@@ -29,11 +29,11 @@ class GlobalExceptionHandler {
         return ResponseEntity(error, HttpStatus.BAD_REQUEST)
     }
 
-    @ExceptionHandler
-    fun handleExceptions(ex: AppExceptions): ResponseEntity<ErrorResponse> {
+    @ExceptionHandler(Exception::class)
+    fun handleExceptions(ex: Exception): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            errorCode = "An unexpected error occurred",
+            errorCode = "INTERNAL_SERVER_ERROR",
             message = ex.message,
         )
         return ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR)
