@@ -1,6 +1,7 @@
 package com.example.permissionsystem.service
 
 import com.example.permissionsystem.dto.RoleOperationResult
+import com.example.permissionsystem.exceptions.AppExceptions
 import com.example.permissionsystem.models.User
 import com.example.permissionsystem.models.UserRole
 import org.springframework.stereotype.Service
@@ -88,14 +89,14 @@ class Operations {
     }
 
     fun validateUserExists(userId: Int): User {
-        return users[userId] ?: throw IllegalArgumentException("User with id $userId not found")
+        return users[userId] ?: throw AppExceptions.UserNotFoundException(userId)
     }
 
     fun validateRoleExists(roleName: String): UserRole {
         val matchedRole = UserRole.entries.find {
             it.name == roleName.uppercase()
         }
-        matchedRole ?: throw IllegalArgumentException("Role $roleName not found")
+        matchedRole ?: throw AppExceptions.RoleNotFoundException(roleName)
         return matchedRole
     }
 }
