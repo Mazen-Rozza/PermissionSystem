@@ -1,5 +1,6 @@
 package com.example.permissionsystem
 
+import com.example.permissionsystem.exceptions.AppExceptions
 import com.example.permissionsystem.service.Operations
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -16,14 +17,14 @@ class OperationsTest {
 
     @Test
     fun `should throw exception when user id is invalid`() {
-        assertThrows<IllegalArgumentException> {
+        assertThrows<AppExceptions.UserNotFoundException> {
             operationsTest.validateUserExists(7)
         }
     }
 
     @Test
     fun `should throw exception when role name is invalid`() {
-        assertThrows<IllegalArgumentException> {
+        assertThrows<AppExceptions.RoleNotFoundException> {
             operationsTest.validateRoleExists("Pizza")
         }
     }
