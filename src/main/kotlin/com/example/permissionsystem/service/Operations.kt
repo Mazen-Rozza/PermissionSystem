@@ -93,10 +93,7 @@ class Operations {
     }
 
     fun validateRoleExists(roleName: String): UserRole {
-        val matchedRole = UserRole.entries.find {
-            it.name == roleName.uppercase()
-        }
-        matchedRole ?: throw AppExceptions.RoleNotFoundException(roleName)
-        return matchedRole
+        val matchedRole = UserRole.entries.find { it.name == roleName.uppercase() }
+        return matchedRole ?: throw AppExceptions.RoleNotFoundException(roleName)
     }
 }
