@@ -1,6 +1,7 @@
 package com.example.permissionsystem.service
 
 import com.example.permissionsystem.dto.RoleOperationResult
+import com.example.permissionsystem.exceptions.AppExceptions
 import com.example.permissionsystem.models.User
 import com.example.permissionsystem.models.UserRole
 import org.springframework.stereotype.Service
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class Operations {
 
-    val users = mutableMapOf<Int, User>(
+    val users = mutableMapOf(
         1 to User(1, 0L),
         2 to User(2, UserRole.ADMIN.rolesMask),
         3 to User(3, UserRole.ADMIN.rolesMask or UserRole.MODERATOR.rolesMask),
@@ -17,28 +18,82 @@ class Operations {
     )
 
     fun addRole(userId: Int, roleName: String): RoleOperationResult {
-
-        val matchedUser = users[userId] ?: throw IllegalArgumentException("User with id $userId not found")
-
-        val matchedRole = UserRole.entries.find {
-            it.name == roleName.uppercase()
-        }
-        matchedRole ?: throw IllegalArgumentException("Role $roleName not found")
-
+        val matchedUser = validateUserExists(userId)
+        val matchedRole = validateRoleExists(roleName)
         val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
 
         if (matchedRole in rolesList) {
-            val stringRolesList : List<String> = rolesList.map { it.name }
+            val stringRolesList: List<String> = rolesList.map { it.name }
             return RoleOperationResult("User with id $userId already has the role ${matchedRole.name}", stringRolesList)
         } else {
             val newMask = matchedUser.assignedRole or matchedRole.rolesMask
-            val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
-            val stringFinalRolesList : List<String> = finalRolesList.map { it.name }
+            val roleUpdate = updateUserRole(matchedUser, newMask)
 
-            val newUserRoles = matchedUser.copy(assignedRole = newMask)
-            users[userId] = newUserRoles
-
-            return RoleOperationResult("Role $matchedRole was added to the user with $userId successfully", stringFinalRolesList)
+            return RoleOperationResult(
+                "Role $matchedRole was added to the user with id $userId successfully",
+                roleUpdate
+            )
         }
+    }
+
+    fun deleteRole(userId: Int, roleName: String): RoleOperationResult {
+        val matchedUser = validateUserExists(userId)
+        val matchedRole = validateRoleExists(roleName)
+        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
+
+        if (matchedRole in rolesList) {
+            val deleteMask = matchedRole.rolesMask.inv()
+            val newMask = deleteMask and matchedUser.assignedRole
+            val roleUpdate = updateUserRole(matchedUser, newMask)
+
+            return RoleOperationResult(
+                "Role $matchedRole was deleted successfully from the user with id $userId",
+                roleUpdate
+            )
+        } else {
+            val stringRolesList: List<String> = rolesList.map { it.name }
+            return RoleOperationResult(
+                "User with id $userId doesn't have the role ${matchedRole.name}",
+                stringRolesList
+            )
+        }
+    }
+
+    fun getUserRoles(userId: Int): RoleOperationResult {
+        val matchedUser = validateUserExists(userId)
+
+        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
+        val stringRolesList: List<String> = rolesList.map { it.name }
+
+        return RoleOperationResult (
+            "Roles retrieved successfully for user with id $userId",
+            stringRolesList
+        )
+    }
+
+    fun checkUserRole(userId: Int, roleName: String): Boolean {
+        val matchedUser = validateUserExists(userId)
+        val matchedRole = validateRoleExists(roleName)
+
+        val hasRole = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
+        return matchedRole in hasRole
+    }
+
+    fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
+        val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
+        val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
+        val newUserRoles = matchedUser.copy(assignedRole = newMask)
+
+        users[matchedUser.useId] = newUserRoles
+        return stringFinalRolesList
+    }
+
+    fun validateUserExists(userId: Int): User {
+        return users[userId] ?: throw AppExceptions.UserNotFoundException(userId)
+    }
+
+    fun validateRoleExists(roleName: String): UserRole {
+        val matchedRole = UserRole.entries.find { it.name == roleName.uppercase() }
+        return matchedRole ?: throw AppExceptions.RoleNotFoundException(roleName)
     }
 }
