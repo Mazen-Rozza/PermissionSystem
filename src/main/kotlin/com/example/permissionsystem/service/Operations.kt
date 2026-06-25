@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class Operations {
 
-    val users = mutableMapOf(
+    val users = mapOf(
         1 to User(1, 0L),
         2 to User(2, UserRole.ADMIN.rolesMask),
         3 to User(3, UserRole.ADMIN.rolesMask or UserRole.MODERATOR.rolesMask),
@@ -22,18 +22,20 @@ class Operations {
         val matchedRole = validateRoleExists(roleName)
         val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
 
-        if (matchedRole in rolesList) {
-            val stringRolesList: List<String> = rolesList.map { it.name }
-            return RoleOperationResult("User with id $userId already has the role ${matchedRole.name}", stringRolesList)
-        } else {
-            val newMask = matchedUser.assignedRole or matchedRole.rolesMask
-            val roleUpdate = updateUserRole(matchedUser, newMask)
 
-            return RoleOperationResult(
-                "Role $matchedRole was added to the user with id $userId successfully",
-                roleUpdate
-            )
-        }
+
+//        if (matchedRole in rolesList) {
+//            val stringRolesList: List<String> = rolesList.map { it.name }
+//            return RoleOperationResult("User with id $userId already has the role ${matchedRole.name}", stringRolesList)
+//        } else {
+//            val newMask = matchedUser.assignedRole or matchedRole.rolesMask
+//            val roleUpdate = updateUserRole(matchedUser, newMask)
+//
+//            return RoleOperationResult(
+//                "Role $matchedRole was added to the user with id $userId successfully",
+//                roleUpdate
+//            )
+//        }
     }
 
     fun deleteRole(userId: Int, roleName: String): RoleOperationResult {
@@ -82,9 +84,8 @@ class Operations {
     fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
         val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
         val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
-        val newUserRoles = matchedUser.copy(assignedRole = newMask)
+        users[matchedUser.useId]?.assignedRole = newMask
 
-        users[matchedUser.useId] = newUserRoles
         return stringFinalRolesList
     }
 
