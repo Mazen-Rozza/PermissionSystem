@@ -20,8 +20,11 @@ class Operations {
     fun addRole(userId: Int, roleName: String): RoleOperationResult {
         val matchedUser = validateUserExists(userId)
         val matchedRole = validateRoleExists(roleName)
-        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
 
+        val userRolesList = matchedRole.rolesMask or matchedUser.assignedRole
+        val stringRolesList = UserRole.entries.filter { it.rolesMask and userRolesList != 0L }. map { it.name }
+
+        return RoleOperationResult(stringRolesList)
 
 
 //        if (matchedRole in rolesList) {
@@ -41,24 +44,27 @@ class Operations {
     fun deleteRole(userId: Int, roleName: String): RoleOperationResult {
         val matchedUser = validateUserExists(userId)
         val matchedRole = validateRoleExists(roleName)
-        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
 
-        if (matchedRole in rolesList) {
-            val deleteMask = matchedRole.rolesMask.inv()
-            val newMask = deleteMask and matchedUser.assignedRole
-            val roleUpdate = updateUserRole(matchedUser, newMask)
+        val userRolesList = matchedRole.rolesMask or matchedUser.assignedRole
+        val stringRolesList = UserRole.entries.filter { it.rolesMask and userRolesList != 0L }. map { it.name }
+        return RoleOperationResult(stringRolesList)
 
-            return RoleOperationResult(
-                "Role $matchedRole was deleted successfully from the user with id $userId",
-                roleUpdate
-            )
-        } else {
-            val stringRolesList: List<String> = rolesList.map { it.name }
-            return RoleOperationResult(
-                "User with id $userId doesn't have the role ${matchedRole.name}",
-                stringRolesList
-            )
-        }
+//        if (matchedRole in rolesList) {
+//            val deleteMask = matchedRole.rolesMask.inv()
+//            val newMask = deleteMask and matchedUser.assignedRole
+//            val roleUpdate = updateUserRole(matchedUser, newMask)
+//
+//            return RoleOperationResult(
+//                "Role $matchedRole was deleted successfully from the user with id $userId",
+//                roleUpdate
+//            )
+//        } else {
+//            val stringRolesList: List<String> = rolesList.map { it.name }
+//            return RoleOperationResult(
+//                "User with id $userId doesn't have the role ${matchedRole.name}",
+//                stringRolesList
+//            )
+//        }
     }
 
     fun getUserRoles(userId: Int): RoleOperationResult {
