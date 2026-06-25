@@ -70,13 +70,9 @@ class Operations {
     fun getUserRoles(userId: Int): RoleOperationResult {
         val matchedUser = validateUserExists(userId)
 
-        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }
-        val stringRolesList: List<String> = rolesList.map { it.name }
+        val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }.map { it.name }
 
-        return RoleOperationResult (
-            "Roles retrieved successfully for user with id $userId",
-            stringRolesList
-        )
+        return RoleOperationResult (rolesList)
     }
 
     fun checkUserRole(userId: Int, roleName: String): Boolean {
