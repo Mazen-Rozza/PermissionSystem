@@ -3,7 +3,7 @@ package com.example.permissionsystem.service
 import com.example.permissionsystem.dto.RoleOperationResult
 import com.example.permissionsystem.exceptions.AppExceptions
 import com.example.permissionsystem.models.User
-import com.example.permissionsystem.models.UserRole
+import com.example.permissionsystem.models.userRole
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,8 +21,10 @@ class Operations {
         val matchedUser = validateUserExists(userId)
         val matchedRole = validateRoleExists(roleName)
 
-        val userRolesList = matchedRole.rolesMask or matchedUser.assignedRole
-        val stringRolesList = UserRole.entries.filter { it.rolesMask and userRolesList != 0L }. map { it.name }
+        val newAssignedRoles = matchedRole.rolesMask or matchedUser.assignedRole
+        users[matchedUser.useId]?.assignedRole = newAssignedRoles
+
+        val stringRolesList = UserRole.entries.filter { it.rolesMask and newAssignedRoles != 0L }.map { it.name }
 
         return RoleOperationResult(stringRolesList)
 
@@ -45,8 +47,10 @@ class Operations {
         val matchedUser = validateUserExists(userId)
         val matchedRole = validateRoleExists(roleName)
 
-        val userRolesList = matchedRole.rolesMask or matchedUser.assignedRole
-        val stringRolesList = UserRole.entries.filter { it.rolesMask and userRolesList != 0L }. map { it.name }
+        val newAssignedRoles = matchedRole.rolesMask.inv() and matchedUser.assignedRole
+        users[matchedUser.useId]?.assignedRole = newAssignedRoles
+
+        val stringRolesList = UserRole.entries.filter { it.rolesMask and newAssignedRoles != 0L }.map { it.name }
         return RoleOperationResult(stringRolesList)
 
 //        if (matchedRole in rolesList) {
@@ -71,8 +75,9 @@ class Operations {
         val matchedUser = validateUserExists(userId)
 
         val rolesList = UserRole.entries.filter { (it.rolesMask and matchedUser.assignedRole) != 0L }.map { it.name }
+        users[matchedUser.useId]?.assignedRole = userRolesList
 
-        return RoleOperationResult (rolesList)
+        return RoleOperationResult(rolesList)
     }
 
     fun checkUserRole(userId: Int, roleName: String): Boolean {
@@ -83,20 +88,24 @@ class Operations {
         return matchedRole in hasRole
     }
 
-    fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
-        val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
-        val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
-        users[matchedUser.useId]?.assignedRole = newMask
+//    fun updateUserRole(matchedUser: User, newMask: Long): List<String> {
+//        val finalRolesList = UserRole.entries.filter { (it.rolesMask and newMask) != 0L }
+//        val stringFinalRolesList: List<String> = finalRolesList.map { it.name }
+//        users[matchedUser.useId]?.assignedRole = newMask
+//
+//        return stringFinalRolesList
+//    }
 
-        return stringFinalRolesList
+    fun getRoleToUser(roleName: String): Long {
+        validateRoleExists(roleName)
+
     }
 
     fun validateUserExists(userId: Int): User {
         return users[userId] ?: throw AppExceptions.UserNotFoundException(userId)
     }
 
-    fun validateRoleExists(roleName: String): UserRole {
-        val matchedRole = UserRole.entries.find { it.name == roleName.uppercase() }
-        return matchedRole ?: throw AppExceptions.RoleNotFoundException(roleName)
+    fun validateRoleExists(roleName: String): Long {
+        return userRole[roleName.uppercase()] ?: throw AppExceptions.RoleNotFoundException(roleName)
     }
 }
