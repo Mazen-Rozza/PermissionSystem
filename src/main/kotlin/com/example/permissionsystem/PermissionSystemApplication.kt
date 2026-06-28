@@ -39,12 +39,6 @@ class PermissionSystemApplication
 //    }
 //}
 
-fun main() {
-    val operationInstance = Operations()
-    val addRoleResult = operationInstance.addRole(2, "CEO")
-    println(addRoleResult)
-}
-
 //fun main() {
 //    val operationInstance = Operations()
 //
